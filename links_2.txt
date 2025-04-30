@@ -1,0 +1,82 @@
+
+# Estudo
+
+https://guide.cloudnativegeo.org/
+https://tyson-swetnam.github.io/agic-2022/
+https://www.gillanscience.com/cloud-native-geospatial/
+https://guide.cloudnativegeo.org/cloud-optimized-geotiffs/intro.html
+
+https://github.com/ua-datalab/Geospatial_Workshops
+https://github.com/ua-datalab/Geospatial_Workshops/wiki/Cloud-Optimized-Geotiffs
+https://github.com/ua-datalab/Geospatial_Workshops/wiki/Geospatial-Data-APIs
+https://github.com/ua-datalab/Geospatial_Workshops/wiki/SpatioTemporal-Asset-Catalogs-(STAC)
+
+https://carpentries-incubator.github.io/geospatial-python/08-crop-raster-data.html
+
+https://gallery.pangeo.io/repos/pangeo-data/landsat-8-tutorial-gallery/index.html
+
+--------------------------------------------------------------------------------------------
+# Code
+
+https://github.com/ProjectPythiaTutorials/thinking-with-xarray_2022_03_09/blob/main/tutorial/01-high-level-computation-patterns.ipynb
+
+--------------------------------------------------------------------------------------------
+
+# Github + AWS
+
+https://github.com/aws-samples/sample-geospatial-foundation-models-on-aws/tree/main
+https://github.com/aws-samples/amazon-sagemaker-ai-for-geospatial/tree/main
+https://github.com/aws-samples/sagemaker-custom-image-for-geospatial-analytics/tree/main
+
+--------------------------------------------------------------------------------------------
+
+# SQL
+
+https://docs.aws.amazon.com/athena/latest/ug/querying-geospatial-data.html
+https://trino.io/docs/current/functions/geospatial.html
+
+https://medium.com/@a.budniy/geo-queries-using-aws-athena-a3efec8d89a5
+https://www.linkedin.com/pulse/running-geospatial-queries-aws-athena-tom-reid/
+
+
+
+https://www.starburst.io/blog/run-optimized-geospatial-queries-with-trino/
+
+
+-- Geospatial
+DROP TABLE base.geodata_geo;
+
+CREATE EXTERNAL TABLE base.geodata_geo (
+  geometry binary,
+  name string
+)
+STORED AS PARQUET
+LOCATION 's3://data-us-east-1-891377318910/geospatial/tb_sitio/';
+
+
+SELECT ST_Polygon('POLYGON ((631571.3995487294 7710970.129301921, 632014.1481523272 7710970.129301921, 632014.1481523272 7711378.045963544, 631571.3995487294 7711378.045963544))');
+SELECT ST_Equals(ST_Point(631786.408 , 7711171.339), ST_Point(631786.408 , 7711171.339));
+SELECT ST_Contains(
+    ST_Polygon('POLYGON ((631571.3995487294 7710970.129301921, 632014.1481523272 7710970.129301921, 632014.1481523272 7711378.045963544, 631571.3995487294 7711378.045963544))'),
+    ST_Point(631786.408 , 7711171.339)
+);
+SELECT ST_Area(ST_Polygon('POLYGON ((631571.3995487294 7710970.129301921, 632014.1481523272 7710970.129301921, 632014.1481523272 7711378.045963544, 631571.3995487294 7711378.045963544))'));
+
+
+SELECT * FROM base.geodata_geo;
+SELECT typeof(ST_GeomFromBinary(geometry)) as geom FROM base.geodata_geo;
+SELECT ST_GeomFromBinary(geometry) as geom FROM base.geodata_geo;
+SELECT ST_Area(ST_GeomFromBinary(geometry)) as area FROM base.geodata_geo;
+SELECT ST_Centroid(ST_GeomFromBinary(geometry)) as area FROM base.geodata_geo;
+
+SELECT 
+    ST_Contains(ST_GeomFromBinary(geometry), ST_Centroid(ST_GeomFromBinary(geometry))) 
+FROM base.geodata_geo;
+
+SELECT 
+    ST_Boundary(ST_GeometryFromText('POLYGON ((631571.3995487294 7710970.129301921, 632014.1481523272 7711378.045963544))')) 
+FROM base.geodata_geo;
+
+SELECT 
+    ST_Intersects(ST_GeomFromBinary(geometry), ST_GeomFromBinary(geometry)) 
+FROM base.geodata_geo;
